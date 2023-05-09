@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { Session } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import ZitadelProvider from "next-auth/providers/zitadel";
 import { Issuer } from "openid-client";
@@ -36,8 +36,8 @@ export default NextAuth({
   providers: [
     ZitadelProvider({
       issuer: process.env.ZITADEL_ISSUER,
-      clientId: process.env.ZITADEL_CLIENT_ID,
-      clientSecret: process.env.ZITADEL_CLIENT_SECRET,
+      clientId: process.env.ZITADEL_CLIENT_ID || "",
+      clientSecret: process.env.ZITADEL_CLIENT_SECRET || "",
       authorization: {
         params: {
           scope: `openid email profile offline_access`,
@@ -74,11 +74,18 @@ export default NextAuth({
       // Access token has expired, try to update it
       return refreshAccessToken(token);
     },
-    async session({ session, token: { user, error: tokenError } }) {
+    async session({
+      session,
+      token: { user, error: tokenError },
+    }: {
+      session: Session;
+      token: JWT;
+    }) {
       logger.info({ user: user }, "session() callback");
       session.user = {
         id: user?.id,
         email: user?.email,
+        emailVerified: user?.emailVerified,
         image: user?.image,
         name: user?.name,
         loginName: user?.loginName,
