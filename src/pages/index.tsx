@@ -1,15 +1,16 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import { signIn, signOut, useSession } from "next-auth/react";
+import logger from "@/services/logger";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const { data: session, status } = useSession();
 
-  console.log("session", session);
-
   const loading = status === "loading";
+
+  logger.info({ session: session }, "index.tsx session");
 
   return (
     <>
@@ -36,6 +37,9 @@ export default function Home() {
             Signed in as {session.user?.loginName} {session.user?.email}
           </p>
           <button onClick={() => signOut()}>Sign out</button>
+
+          <h3 className="mt-10">session</h3>
+          <pre>{JSON.stringify(session, null, 2)}</pre>
         </>
       )}
     </>

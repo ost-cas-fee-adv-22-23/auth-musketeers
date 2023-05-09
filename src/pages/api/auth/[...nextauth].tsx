@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import { JWT } from "next-auth/jwt";
 import ZitadelProvider from "next-auth/providers/zitadel";
 import { Issuer } from "openid-client";
+import logger from "@/services/logger";
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
@@ -57,12 +58,14 @@ export default NextAuth({
   ],
   callbacks: {
     async jwt({ token, user, account }) {
-      console.log("jwt()");
+      logger.info("jwt()");
       token.user ??= user;
       token.accessToken ??= account?.access_token;
       token.refreshToken ??= account?.refresh_token;
       token.expiresAt ??= (account?.expires_at ?? 0) * 1000;
       token.error = undefined;
+
+      logger.info({ token: token }, "jwt() callback");
       // Return previous token if the access token has not expired yet
       if (Date.now() < (token.expiresAt as number)) {
         return token;
@@ -72,7 +75,7 @@ export default NextAuth({
       return refreshAccessToken(token);
     },
     async session({ session, token: { user, error: tokenError } }) {
-      console.log("user", user);
+      logger.info({ user: user }, "session() callback");
       session.user = {
         id: user?.id,
         email: user?.email,
