@@ -35,6 +35,13 @@ export default function Home() {
         <>
           <p>
             Signed in as {session.user?.loginName} {session.user?.email}
+            <Image
+              src={session.user?.image ?? ""}
+              alt="Profile picture"
+              width={100}
+              height={100}
+              className="w-auto h-auto"
+            />
           </p>
           <button onClick={() => signOut()}>Sign out</button>
 
