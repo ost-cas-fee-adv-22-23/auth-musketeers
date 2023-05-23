@@ -18,7 +18,7 @@ export default function Home() {
       <h1 className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
         Musketeer&apos;s Auth Sandbox App
       </h1>
-      {!session && (
+      {!session && !loading && (
         <>
           <p>Not signed in</p>
           <br />
